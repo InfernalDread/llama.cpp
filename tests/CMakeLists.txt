@@ -186,6 +186,7 @@ endif()
 llama_build_and_test(test-chat-peg-parser.cpp peg-parser/simple-tokenize.cpp)
 llama_build_and_test(test-jinja.cpp)
 llama_test(test-jinja NAME test-jinja-py ARGS -py LABEL python)
+llama_build_and_test(test-chat-auto-parser.cpp)
 llama_build_and_test(test-json-partial.cpp)
 llama_build_and_test(test-log.cpp)
 llama_build_and_test(
@@ -195,6 +196,7 @@ llama_build_and_test(
     peg-parser/test-gbnf-generation.cpp
     peg-parser/test-json-parser.cpp
     peg-parser/test-json-serialization.cpp
+    peg-parser/test-python-dict-parser.cpp
     peg-parser/test-unicode.cpp
     peg-parser/tests.h
 )
