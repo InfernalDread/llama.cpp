@@ -12,6 +12,14 @@
 #include <cfloat>
 #include <cmath>
 
+// Defininig turbo3_cpu_wht_group_size based on OS.
+// In windows, it was giving error
+#ifdef _WIN32
+int turbo3_cpu_wht_group_size = 8;
+#else
+extern int turbo3_cpu_wht_group_size;
+#endif
+
 // ggml_compute_forward_dup
 
 static void ggml_compute_forward_dup_same_cont(
@@ -4929,7 +4937,7 @@ static void ggml_compute_forward_set_rows_f32(
 
     // For turbo types: communicate WHT group size to the quantize function via global
     if (dst->type == GGML_TYPE_TURBO3_0 || dst->type == GGML_TYPE_TURBO4_0 || dst->type == GGML_TYPE_TURBO2_0) {
-        extern int turbo3_cpu_wht_group_size;
+        // extern int turbo3_cpu_wht_group_size; Defining at beginig based on operating system
         int gs = 0;
         memcpy(&gs, dst->op_params, sizeof(int));
         turbo3_cpu_wht_group_size = (gs == 64 || gs == 128) ? gs : 0;

@@ -20,17 +20,28 @@
 #define INNERQ_MAX_CHANNELS 128
 #endif
 
+// Added condition based on OS so it wouldn't crash in windows
 #ifdef GGML_USE_CUDA
+#if defined(_WIN32)
+// Windows/MSVC: Define symbols here to satisfy the strict linker
+bool  g_innerq_finalized = false;
+float g_innerq_scale_inv_host[INNERQ_MAX_CHANNELS] = {};
+bool turbo_innerq_needs_tensor_update(void) { return false; }
+void turbo_innerq_mark_tensor_updated(void) {}
+#else
+// Linux/Mac: Use extern as the symbols are provided by the CUDA object files
 extern bool  g_innerq_finalized;
 extern float g_innerq_scale_inv_host[INNERQ_MAX_CHANNELS];
 extern bool turbo_innerq_needs_tensor_update(void);
 extern void turbo_innerq_mark_tensor_updated(void);
+#endif // _WIN32
 #else
+// CPU Fallback: Shared across all platforms
 static bool  g_innerq_finalized = false;
-static float g_innerq_scale_inv_host[INNERQ_MAX_CHANNELS] = {};
+static float g_inner_scale_inv_host[INNERQ_MAX_CHANNELS] = {};
 static bool turbo_innerq_needs_tensor_update(void) { return false; }
 static void turbo_innerq_mark_tensor_updated(void) {}
-#endif
+#endif // GGML_USE_CUDA
 
 static bool ggml_is_power_of_2(int n) {
     return (n & (n - 1)) == 0;
