@@ -1,3 +1,72 @@
+# Latest llama.cpp (April 10 2026) with TurboQuant + IsoQuant + PlanarQuant
+
+This repository is a fork of the latest [upstream llama.cpp](https://github.com/ggerganov/llama.cpp). It integrates cutting-edge quantization techniques to support along with the latest llama.cpp optimizations with **Gemma 4** model support.
+
+## Key Features
+* **Latest Upstream Sync**: Based on the most recent updates from the master repository (April 10 2026).
+* **New Quantization Support**: Integrated **PlanarQuant**, **IsoQuant**, and **TurboQuant** from the [johndpope/llama-cpp-turboquant](https://github.com/johndpope/llama-cpp-turboquant) repository.
+* **Windows/MSVC Compatibility**: Includes manual fixes for `M_PI` definitions, `InnerQ` linker symbols, and `std::transform` loops to ensure stable builds on Windows.
+* **GPU Optimized**: Specifically tested for NVIDIA **GTX 1660 (Turing)** and **RTX 4070 (Ada Lovelace)** architectures.
+
+[Windows/MSVC fix source](https://www.reddit.com/r/LocalLLaMA/comments/1sbdihw/gemma_4_31b_at_256k_full_context_on_a_single_rtx/)
+
+## Quick Start for Windows (RTX 4070 / GTX 1660)
+
+**Requirements**
+
+Before building, ensure you have the following installed on Windows:
+* [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) (Include "Desktop development with C++")
+* [CMake](https://cmake.org/download/) (Add to system PATH)
+* [NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) (Tested with 12.x)
+* [Git for Windows](https://gitforwindows.org/)
+
+If you want to use this fork directly, just run these commands in PowerShell:
+
+```powershell
+# 1. Clone this specific fork
+git clone https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git -b windows-fix-2026-04-10 llama.cpp
+cd llama.cpp
+
+# 2. Configure for Windows/CUDA
+cmake -B build -A x64 -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES="75;89" -DBUILD_SHARED_LIBS=ON -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES" -DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES" -Wno-dev
+
+# 3. Build everything
+cmake --build build --config Release -j
+```
+
+---
+
+### Reproducing this Build
+To recreate this environment and merge the latest features yourself, follow these steps:
+
+```powershell
+# 1. Clone this repository
+git clone https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git llama.cpp
+cd llama.cpp
+
+# 2. Add the PlanarQuant remote and fetch updates
+git remote add planarquant [https://github.com/johndpope/llama-cpp-turboquant.git](https://github.com/johndpope/llama-cpp-turboquant.git)
+git fetch planarquant
+
+# 3. Create a merge branch and pull the feature
+git checkout -b merge-planarquant-latest
+git merge planarquant/feature/planarquant-kv-cache
+
+# 4. Check for merge conflicts (if any)
+git status --short | Select-String "^UU"
+
+# 5. Configure for Windows/CUDA (Targets 1660 and 4070)
+cmake -B build -A x64 -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES="75;89" -DBUILD_SHARED_LIBS=ON -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -Wno-dev
+
+# 6. Build the project
+cmake --build build --config Release -j
+```
+
+Original llama.cpp README is given below
+
+---
+
+
 # llama.cpp
 
 ![llama](https://user-images.githubusercontent.com/1991296/230134379-7181e485-c521-4d23-a0d6-f7b3b61ba524.png)

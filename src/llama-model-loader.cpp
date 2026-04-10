@@ -375,13 +375,14 @@ namespace GGUFMeta {
             }
         } else {
             if (arr_info.gt == GGUF_TYPE_BOOL) {
-                const int8_t * values = (const int8_t *) arr_info.data;
-                std::transform(values, values + arr_info.length, result.begin(), [](int8_t x) {
-                    return static_cast<T>(x != 0);
-                });
-            } else {
-                std::copy((const T*)arr_info.data, (const T *)arr_info.data + arr_info.length, result.begin());
-            }
+                // So it wouldn't crash in Windows.
+				const uint8_t * data = (const uint8_t *)arr_info.data;
+				for (size_t i = 0; i < arr_info.length; ++i) {
+					result[i] = static_cast<T>(data[i] != 0);
+				}
+			} else {
+				std::copy((const T*)arr_info.data, (const T *)arr_info.data + arr_info.length, result.begin());
+			}
         }
 
         return true;
