@@ -38,7 +38,7 @@ extern void turbo_innerq_mark_tensor_updated(void);
 #else
 // CPU Fallback: Shared across all platforms
 static bool  g_innerq_finalized = false;
-static float g_inner_scale_inv_host[INNERQ_MAX_CHANNELS] = {};
+static float g_innerq_scale_inv_host[INNERQ_MAX_CHANNELS] = {};
 static bool turbo_innerq_needs_tensor_update(void) { return false; }
 static void turbo_innerq_mark_tensor_updated(void) {}
 #endif // GGML_USE_CUDA
