@@ -11,6 +11,15 @@ This repository is a fork of the latest [upstream llama.cpp](https://github.com/
 [Windows/MSVC fix source](https://www.reddit.com/r/LocalLLaMA/comments/1sbdihw/gemma_4_31b_at_256k_full_context_on_a_single_rtx/)
 
 ## Quick Start for Windows (RTX 4070 / GTX 1660)
+
+**Requirements**
+
+Before building, ensure you have the following installed on Windows:
+* [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) (Include "Desktop development with C++")
+* [CMake](https://cmake.org/download/) (Add to system PATH)
+* [NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-downloads) (Tested with 12.x)
+* [Git for Windows](https://gitforwindows.org/)
+
 If you want to use this fork directly, just run these commands in PowerShell:
 
 ```powershell
