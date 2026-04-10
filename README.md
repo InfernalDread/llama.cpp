@@ -10,6 +10,21 @@ This repository is a fork of the latest [upstream llama.cpp](https://github.com/
 
 [Windows/MSVC fix source](https://www.reddit.com/r/LocalLLaMA/comments/1sbdihw/gemma_4_31b_at_256k_full_context_on_a_single_rtx/)
 
+## Quick Start for Windows (RTX 4070 / GTX 1660)
+If you want to use this fork directly, just run these commands in PowerShell:
+
+```powershell
+# 1. Clone this specific fork
+git clone [https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git](https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git) -b windows-fix-2026-04-10 llama.cpp
+cd llama.cpp
+
+# 2. Configure for Windows/CUDA
+cmake -B build -A x64 -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES="75;89" -DBUILD_SHARED_LIBS=ON -DGGML_BACKEND_DL=ON -DGGML_CPU_ALL_VARIANTS=ON -DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES" -DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES" -Wno-dev
+
+# 3. Build everything
+cmake --build build --config Release -j
+```
+
 ---
 
 ### ## Reproducing this Build
