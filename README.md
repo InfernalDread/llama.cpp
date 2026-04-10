@@ -24,7 +24,7 @@ If you want to use this fork directly, just run these commands in PowerShell:
 
 ```powershell
 # 1. Clone this specific fork
-git clone [https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git](https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git) -b windows-fix-2026-04-10 llama.cpp
+git clone https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git -b windows-fix-2026-04-10 llama.cpp
 cd llama.cpp
 
 # 2. Configure for Windows/CUDA
@@ -36,12 +36,12 @@ cmake --build build --config Release -j
 
 ---
 
-### ## Reproducing this Build
+### Reproducing this Build
 To recreate this environment and merge the latest features yourself, follow these steps:
 
 ```powershell
 # 1. Clone this repository
-git clone [https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git](https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git) llama.cpp
+git clone https://github.com/Addy-ad/llama-cpp-turbo-planar-iso.git llama.cpp
 cd llama.cpp
 
 # 2. Add the PlanarQuant remote and fetch updates
