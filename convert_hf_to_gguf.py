@@ -10902,7 +10902,10 @@ class NemotronHModel(GraniteHybridModel):
 
         from transformers import AutoTokenizer
         tokenizer = AutoTokenizer.from_pretrained(self.dir_model, trust_remote_code=True)
-
+        
+        if tokenizer is None:
+            raise RuntimeError(f"Failed to load tokenizer from {self.dir_model}")
+        
         # Pad vocab size (from Mamba2Model/GraniteHybridModel)
         self.hparams["pad_vocab_size_multiple"] = 8 # Setting this here since GraniteHybridModel.set_vocab() isn't being invoked now.
         # From Mamba2Model.set_vocab():
@@ -10912,14 +10915,14 @@ class NemotronHModel(GraniteHybridModel):
         vocab_size = -(vocab_size // -pad_vocab) * pad_vocab
         self.hparams["vocab_size"] = vocab_size
 
-        assert max(tokenizer.vocab.values()) < vocab_size
+        assert max(tokenizer.vocab.values()) < vocab_size # type: ignore
 
-        tokpre = self.get_vocab_base_pre(tokenizer)
+        tokpre = self.get_vocab_base_pre(tokenizer) # type: ignore
 
-        reverse_vocab = {id_: encoded_tok for encoded_tok, id_ in tokenizer.vocab.items()}
-        added_vocab = tokenizer.get_added_vocab()
+        reverse_vocab = {id_: encoded_tok for encoded_tok, id_ in tokenizer.vocab.items()} # type: ignore
+        added_vocab = tokenizer.get_added_vocab() # type: ignore
 
-        added_tokens_decoder = tokenizer.added_tokens_decoder
+        added_tokens_decoder = tokenizer.added_tokens_decoder # type: ignore
 
         for i in range(vocab_size):
             if i not in reverse_vocab:
@@ -10930,7 +10933,7 @@ class NemotronHModel(GraniteHybridModel):
                 if token in added_vocab:
                     if not added_tokens_decoder[i].normalized:
                         previous_token = token
-                        token = tokenizer.decode(tokenizer.encode(token, add_special_tokens=False))
+                        token = tokenizer.decode(tokenizer.encode(token, add_special_tokens=False)) # type: ignore
                         if previous_token != token:
                             logger.info(f"{repr(previous_token)} is encoded and decoded back to {repr(token)} using AutoTokenizer")
 
