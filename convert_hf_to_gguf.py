@@ -10915,14 +10915,14 @@ class NemotronHModel(GraniteHybridModel):
         vocab_size = -(vocab_size // -pad_vocab) * pad_vocab
         self.hparams["vocab_size"] = vocab_size
 
-        assert max(tokenizer.vocab.values()) < vocab_size # type: ignore
+        assert max(tokenizer.vocab.values()) < vocab_size  # ty: ignore[unresolved-attribute]
 
         tokpre = self.get_vocab_base_pre(tokenizer) # type: ignore
 
-        reverse_vocab = {id_: encoded_tok for encoded_tok, id_ in tokenizer.vocab.items()} # type: ignore
-        added_vocab = tokenizer.get_added_vocab() # type: ignore
+        reverse_vocab = {id_: encoded_tok for encoded_tok, id_ in tokenizer.vocab.items()}  # ty: ignore[unresolved-attribute]
+        added_vocab = tokenizer.get_added_vocab()  # ty: ignore[unresolved-attribute]
 
-        added_tokens_decoder = tokenizer.added_tokens_decoder # type: ignore
+        added_tokens_decoder = tokenizer.added_tokens_decoder  # ty: ignore[unresolved-attribute]
 
         for i in range(vocab_size):
             if i not in reverse_vocab:
@@ -10933,7 +10933,7 @@ class NemotronHModel(GraniteHybridModel):
                 if token in added_vocab:
                     if not added_tokens_decoder[i].normalized:
                         previous_token = token
-                        token = tokenizer.decode(tokenizer.encode(token, add_special_tokens=False)) # type: ignore
+                        token = tokenizer.decode(tokenizer.encode(token, add_special_tokens=False))  # ty: ignore[unresolved-attribute, invalid-assignment]
                         if previous_token != token:
                             logger.info(f"{repr(previous_token)} is encoded and decoded back to {repr(token)} using AutoTokenizer")
 
