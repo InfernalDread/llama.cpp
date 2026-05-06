@@ -10941,7 +10941,10 @@ class NemotronHModel(GraniteHybridModel):
 
         from transformers import AutoTokenizer
         tokenizer = AutoTokenizer.from_pretrained(self.dir_model, trust_remote_code=True)
-
+        
+        if tokenizer is None:
+            raise RuntimeError(f"Failed to load tokenizer from {self.dir_model}")
+        
         # Pad vocab size (from Mamba2Model/GraniteHybridModel)
         self.hparams["pad_vocab_size_multiple"] = 8 # Setting this here since GraniteHybridModel.set_vocab() isn't being invoked now.
         # From Mamba2Model.set_vocab():
@@ -10953,7 +10956,7 @@ class NemotronHModel(GraniteHybridModel):
 
         assert max(tokenizer.vocab.values()) < vocab_size  # ty: ignore[unresolved-attribute]
 
-        tokpre = self.get_vocab_base_pre(tokenizer)
+        tokpre = self.get_vocab_base_pre(tokenizer) # type: ignore
 
         reverse_vocab = {id_: encoded_tok for encoded_tok, id_ in tokenizer.vocab.items()}  # ty: ignore[unresolved-attribute]
         added_vocab = tokenizer.get_added_vocab()  # ty: ignore[unresolved-attribute]
