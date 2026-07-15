@@ -126,6 +126,47 @@ static bool common_speculative_are_compatible(
     return true;
 }
 
+// decode a batch on the draft context, retrying with progressively smaller chunks
+// when llama_decode fails to find a free slot in the KV cache (ret == 1)
+// this mirrors the retry logic of the main decode path in tools/server
+// returns 0 on success, otherwise the error code of the failed llama_decode call
+static int32_t common_speculative_decode_dft(llama_context * ctx_dft, const llama_batch & batch, int32_t n_embd) {
+    int32_t n_batch = batch.n_tokens;
+
+    int32_t off = 0;
+    while (off < batch.n_tokens) {
+        const int32_t n_tokens = std::min(n_batch, batch.n_tokens - off);
+
+        llama_batch batch_view = {
+            /*.n_tokens =*/ n_tokens,
+            /*.token    =*/ batch.token ? batch.token + off : nullptr,
+            /*.embd     =*/ batch.embd  ? batch.embd + (size_t) off * n_embd : nullptr,
+            /*.pos      =*/ batch.pos      + off,
+            /*.n_seq_id =*/ batch.n_seq_id + off,
+            /*.seq_id   =*/ batch.seq_id   + off,
+            /*.logits   =*/ batch.logits   + off,
+        };
+
+        const int32_t ret = llama_decode(ctx_dft, batch_view);
+        if (ret == 0) {
+            off += n_tokens;
+            continue;
+        }
+
+        if (ret != 1 || n_tokens == 1) {
+            // non-retryable error, or no free slot even for a single token
+            return ret;
+        }
+
+        // retry with half the batch size to try to find a free slot in the KV cache
+        n_batch = n_tokens / 2;
+
+        SPC_WRN("failed to find free space in the draft KV cache, retrying with smaller batch size, off = %d, n_batch = %d, ret = %d\n", off, n_batch, ret);
+    }
+
+    return 0;
+}
+
 using common_speculative_draft_params_vec = std::vector<common_speculative_draft_params>;
 
 // state of an implementation of speculative decoding
@@ -1431,7 +1472,7 @@ struct common_speculative_impl_draft_mtp : public common_speculative_impl {
                     llama_set_nextn_layer_offset(ctx_dft, head);
                 }
 
-                const int32_t rc = llama_decode(ctx_dft, batch);
+                const int32_t rc = common_speculative_decode_dft(ctx_dft, batch, n_embd);
                 if (rc != 0) {
                     SPC_ERR("llama_decode(ctx_dft) head=%d failed rc=%d (pos=%d)\n",
                             head, (int) rc, (int) batch_in.pos[0]);
